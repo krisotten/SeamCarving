@@ -1,3 +1,5 @@
+/* JUnit tests to further test the image resizing algorithm in SeamCarver.java */
+
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -5,7 +7,6 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SeamCarverTest {
-    // TODO: Provide accuracy tests on the methods marked with TODO && provide your own images to SeamCarve! (original + seamcarved)
     @Test
     public void balloon() {
         Picture balloon = new Picture("hotAirBalloon.jpeg");
