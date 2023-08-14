@@ -1,8 +1,14 @@
+/*
+Contains an alogirthm for resizing images in a content aware manner using seam carving 
+*/
+
 import java.util.PriorityQueue;
 
 public class SeamCarver {
+    // create integer variables for the width and height of the image
     private int width;
     private int height;
+    //create a Picture variable for the image
     private Picture pictureCopy;
 
     // create a seam carver object based on the given picture
@@ -72,11 +78,12 @@ public class SeamCarver {
             }
         }
 
-        //TODO: Use Dynamic Programming to find the vertical seam
+        // Finding the vertical seam using dynamic programming
         int[] vSeam = new int[height];
         double[][] summedEnergies = new double[width][height];
         int[][] paths = new int[width][height];
 
+        // Initialize all values in the summedEnergies array to the maximum integer value
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 summedEnergies[col][row] = Integer.MAX_VALUE;
@@ -86,9 +93,11 @@ public class SeamCarver {
             }
         }
 
+        // Begin calculating the actual value for summedEnergies at each pixel in the image
         for (int row = 0; row < height - 1; row++) {
             for (int col = 0; col < width; col++) {
-
+                // For a valid vertical seam, can only move down, down and to the right, or down and to the left from the current pixel
+                // Once values are updated, the path is recorded in the paths array
                 if (col - 1 >= 0 && energy[col - 1][row + 1] + summedEnergies[col][row] < summedEnergies[col - 1][row + 1]) {
                     summedEnergies[col - 1][row + 1] = energy[col - 1][row + 1] + summedEnergies[col][row];
                     paths[col - 1][row + 1] = col;
@@ -104,6 +113,7 @@ public class SeamCarver {
             }
         }
 
+        // For a vertical seam, we will start in the first row. Find the column index of the pixel in the first row with the lowest energy value.
         double min = summedEnergies[0][height - 1];
         int minCol = 0;
         for (int col = 1; col < width; col++) {
@@ -112,10 +122,11 @@ public class SeamCarver {
                 minCol = col;
             }
         }
-
+        
         int row = height - 1;
         int col = paths[minCol][row];
 
+        // Loop back through paths array and add column indexes to the vSeam array 
         while (row > 0) {
             vSeam[row] = col;
             row--;
@@ -125,7 +136,7 @@ public class SeamCarver {
         return vSeam;
     }
 
-    // sequence of indices for horizontal seam
+    // The logic for finding the horizontal seam is the same as the vertical seam just in a different direction.
     public int[] findHorizontalSeam() {
         double[][] energy = new double[width][height];
         for (int row = 0; row < height; row++) {
@@ -135,8 +146,7 @@ public class SeamCarver {
         }
 
         int[] hSeam = new int[width];
-
-        //TODO: Use Dynamic Programming to find the horizontal seam U
+        
         double[][] summedEnergies = new double[width][height];
         int[][] paths = new int[width][height];
 
@@ -179,6 +189,7 @@ public class SeamCarver {
         int col = width - 1;
         int row = paths[col][minRow];
 
+    
         while (col > 0) {
             hSeam[col] = row;
             col--;
@@ -193,6 +204,7 @@ public class SeamCarver {
         if (seam == null) {
             throw new IllegalArgumentException("the argument to removeVerticalSeam() is null\n");
         }
+        // If the seam does not go all the way across the picture, throw an exception
         if (seam.length != height) {
             throw new IllegalArgumentException("the length of seam not equal height\n");
         }
@@ -201,7 +213,10 @@ public class SeamCarver {
             throw new IllegalArgumentException("the width of the picture is less than or equal to 1\n");
         }
 
+        // Create a new picture object that has the width of the current picture minus 1 to account for the vertical seam to be removed
         Picture tmpPicture = new Picture(width - 1, height);
+
+        // Loop through the current picture and remove the vertical seam by replacing each pixel in the vertical seam with the pixel directly to the right of it
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width - 1; col++) {
                 validateColumnIndex(seam[row]);
@@ -212,11 +227,12 @@ public class SeamCarver {
                 }
             }
         }
+        
         pictureCopy = tmpPicture;
         width--;
     }
 
-    // remove horizontal seam from current picture
+    // Follows the same logic as removing the vertical seam, just in a different direction
     public void removeHorizontalSeam(int[] seam) {
         //TODO: Remove a horizontal seam
         if (seam == null) {
